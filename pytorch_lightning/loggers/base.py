@@ -1,8 +1,16 @@
 import argparse
+import sys
 from abc import ABC, abstractmethod
 from argparse import Namespace
 from functools import wraps
 from typing import Union, Optional, Dict, Iterable, Any, Callable, List
+
+try:
+    from omegaconf import OmegaConf, DictConfig
+except:
+    # If the above import has failed, users cannot surely input parameters whose type is DictConf.
+    # So here pass through without raising warnings and exceptions.
+    pass
 
 import torch
 
@@ -45,15 +53,15 @@ class LightningLoggerBase(ABC):
         pass
 
     @staticmethod
-    def _convert_params(params: Union[Dict[str, Any], Namespace]) -> Dict[str, Any]:
+    def _convert_params(params: Union[Dict[str, Any], DictConfig, Namespace]) -> Dict[str, Any]:
         # in case converting from namespace
         if isinstance(params, Namespace):
-            params = vars(params)
-
-        if params is None:
-            params = {}
-
-        return params
+            return params = vars(params)
+        elif params is None:
+            return {}
+        elif 'omegaconf' in sys.modules:
+            if isinstance(params, DictConfig):
+                return OmegaConf.to_container(params, resolve=True)
 
     @staticmethod
     def _flatten_dict(params: Dict[str, Any], delimiter: str = '/') -> Dict[str, Any]:
