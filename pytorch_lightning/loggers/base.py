@@ -5,14 +5,8 @@ from argparse import Namespace
 from functools import wraps
 from typing import Union, Optional, Dict, Iterable, Any, Callable, List
 
-try:
-    from omegaconf import OmegaConf, DictConfig
-except:
-    # If the above import has failed, users cannot surely input parameters whose type is DictConf.
-    # So here pass through without raising warnings and exceptions.
-    pass
-
 import torch
+from omegaconf import OmegaConf, DictConfig
 
 
 def rank_zero_only(fn: Callable):
@@ -57,11 +51,10 @@ class LightningLoggerBase(ABC):
         # in case converting from namespace
         if isinstance(params, Namespace):
             return params = vars(params)
+        elif isinstance(params, DictConfig):
+            return OmegaConf.to_container(params, resolve=True)
         elif params is None:
             return {}
-        elif 'omegaconf' in sys.modules:
-            if isinstance(params, DictConfig):
-                return OmegaConf.to_container(params, resolve=True)
 
     @staticmethod
     def _flatten_dict(params: Dict[str, Any], delimiter: str = '/') -> Dict[str, Any]:
@@ -120,7 +113,7 @@ class LightningLoggerBase(ABC):
         return {k: v if type(v) in [bool, int, float, str, torch.Tensor] else str(v) for k, v in params.items()}
 
     @abstractmethod
-    def log_hyperparams(self, params: argparse.Namespace):
+    def log_hyperparams(self, params: Union[Dict[str, Any], Namespace, DictConfig]):
         """Record hyperparameters.
 
         Args:

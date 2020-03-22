@@ -34,6 +34,8 @@ except ImportError:
     raise ImportError('You want to use `mlflow` logger which is not installed yet,'
                       ' install it with `pip install mlflow`.')
 
+from omegaconf import DictConfig
+
 from .base import LightningLoggerBase, rank_zero_only
 
 
@@ -86,7 +88,7 @@ class MLFlowLogger(LightningLoggerBase):
         return self._run_id
 
     @rank_zero_only
-    def log_hyperparams(self, params: Union[Dict[str, Any], Namespace]) -> None:
+    def log_hyperparams(self, params: Union[Dict[str, Any], Namespace, DictConfig]) -> None:
         params = self._convert_params(params)
         params = self._flatten_dict(params)
         for k, v in params.items():

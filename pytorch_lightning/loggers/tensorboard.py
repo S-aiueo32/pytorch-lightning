@@ -7,6 +7,7 @@ from warnings import warn
 import torch
 from pkg_resources import parse_version
 from torch.utils.tensorboard import SummaryWriter
+from omegaconf import DictConfig
 
 from .base import LightningLoggerBase, rank_zero_only
 
@@ -99,7 +100,7 @@ class TensorBoardLogger(LightningLoggerBase):
         return self._experiment
 
     @rank_zero_only
-    def log_hyperparams(self, params: Union[Dict[str, Any], Namespace]) -> None:
+    def log_hyperparams(self, params: Union[Dict[str, Any], Namespace, DictConfig]) -> None:
         params = self._convert_params(params)
         params = self._flatten_dict(params)
         sanitized_params = self._sanitize_params(params)

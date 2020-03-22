@@ -40,6 +40,8 @@ except ImportError:
     raise ImportError('You want to use `TRAINS` logger which is not installed yet,'
                       ' install it with `pip install trains`.')
 
+from omegaconf import DictConfig
+
 from .base import LightningLoggerBase, rank_zero_only
 
 
@@ -94,7 +96,7 @@ class TrainsLogger(LightningLoggerBase):
         return self._trains.id
 
     @rank_zero_only
-    def log_hyperparams(self, params: Union[Dict[str, Any], Namespace]) -> None:
+    def log_hyperparams(self, params: Union[Dict[str, Any], Namespace, DictConfig]) -> None:
         """Log hyperparameters (numeric values) in TRAINS experiments
 
         Args:

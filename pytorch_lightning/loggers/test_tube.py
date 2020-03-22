@@ -7,6 +7,8 @@ except ImportError:
     raise ImportError('You want to use `test_tube` logger which is not installed yet,'
                       ' install it with `pip install test-tube`.')
 
+from omegaconf import DictConfig
+
 from .base import LightningLoggerBase, rank_zero_only
 
 
@@ -92,7 +94,7 @@ class TestTubeLogger(LightningLoggerBase):
         return self._experiment
 
     @rank_zero_only
-    def log_hyperparams(self, params: Union[Dict[str, Any], Namespace]) -> None:
+    def log_hyperparams(self, params: Union[Dict[str, Any], Namespace, DictConfig]) -> None:
         # TODO: HACK figure out where this is being set to true
         self.experiment.debug = self.debug
         params = self._convert_params(params)

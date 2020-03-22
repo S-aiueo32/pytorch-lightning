@@ -26,6 +26,7 @@ except ImportError:
 
 import torch
 from torch import is_tensor
+from omegaconf import DictConfig
 
 from pytorch_lightning.utilities.debugging import MisconfigurationException
 from .base import LightningLoggerBase, rank_zero_only
@@ -161,7 +162,7 @@ class CometLogger(LightningLoggerBase):
         return self._experiment
 
     @rank_zero_only
-    def log_hyperparams(self, params: Union[Dict[str, Any], Namespace]) -> None:
+    def log_hyperparams(self, params: Union[Dict[str, Any], Namespace, DictConfig]) -> None:
         params = self._convert_params(params)
         params = self._flatten_dict(params)
         self.experiment.log_parameters(params)
